@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caçamba — Solicitações</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1a7f3c;
+  --green-light: #e8f5ee;
+  --green-mid: #c3e6d0;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--gray-900); min-height: 100vh; }
+ 
+/* NAV */
+nav { background: var(--green); padding: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.nav-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: stretch; padding: 0 16px; }
+.nav-logo { color: white; font-size: 15px; font-weight: 600; padding: 14px 0; margin-right: auto; display: flex; align-items: center; gap: 8px; }
+.nav-logo span { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 8px; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; }
+.nav-tabs { display: flex; }
+.nav-tab { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; padding: 0 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; height: 100%; display: flex; align-items: center; }
+.nav-tab.active { color: white; border-bottom-color: white; }
+.nav-tab:hover { color: white; }
+ 
+/* MAIN */
+main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
+ 
+/* CARDS */
+.card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+.card-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--gray-100); }
+.card-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+.card-header p { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.card-body { padding: 16px 20px; }
+ 
+/* FORM FIELDS */
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 8px; }
+.field label .req { color: var(--red); margin-left: 2px; }
+ 
+/* CHIPS */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip { padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--gray-200); background: white; color: var(--gray-600); cursor: pointer; transition: all 0.12s; user-select: none; }
+.chip:hover { border-color: var(--green); color: var(--green); }
+.chip.on { background: var(--green); color: white; border-color: var(--green); }
+.chip.on:hover { background: #15692f; }
+ 
+/* TEXT INPUT */
+input[type=text], input[type=date], textarea {
+  width: 100%; padding: 10px 12px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  background: var(--gray-50); color: var(--gray-900); outline: none; transition: border 0.15s;
+}
+input[type=text]:focus, input[type=date]:focus, textarea:focus { border-color: var(--green); background: white; }
+textarea { resize: vertical; min-height: 70px; }
+ 
+/* BUTTON */
+.btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+  border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+.btn:hover { background: #15692f; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { background: var(--gray-300); cursor: not-allowed; }
+.btn-outline { background: white; color: var(--green); border: 1.5px solid var(--green); }
+.btn-outline:hover { background: var(--green-light); }
+.btn-sm { width: auto; padding: 7px 14px; font-size: 13px; display: inline-block; }
+ 
+/* SUCCESS */
+.success-box { text-align: center; padding: 32px 20px; display: none; }
+.success-icon { width: 56px; height: 56px; background: var(--green-light); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.success-icon svg { width: 28px; height: 28px; stroke: var(--green); }
+.success-box h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.success-box p { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; }
+ 
+/* GESTÃO */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+.filter-chip { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--gray-200); background: white; color: var(--gray-500); cursor: pointer; transition: all 0.12s; }
+.filter-chip.on { background: var(--gray-900); color: white; border-color: var(--gray-900); }
+.filter-label { font-size: 12px; color: var(--gray-400); margin-right: 2px; }
+ 
+.pedido-card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+.pedido-card:hover { box-shadow: var(--shadow-md); }
+.pedido-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--gray-100); }
+.pedido-cliente { font-size: 14px; font-weight: 600; color: var(--gray-900); flex: 1; }
+.pedido-cidade { font-size: 12px; color: var(--gray-500); }
+.badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.badge-pendente { background: var(--amber-light); color: var(--amber); }
+.badge-agendado { background: var(--blue-light); color: var(--blue); }
+.badge-concluido { background: var(--green-light); color: var(--green); }
+.badge-cancelado { background: var(--gray-100); color: var(--gray-500); }
+ 
+.pedido-body { padding: 10px 16px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pedido-tag { font-size: 12px; color: var(--gray-600); background: var(--gray-100);
+  border-radius: 5px; padding: 3px 8px; font-family: 'DM Mono', monospace; }
+.pedido-comprador { font-size: 12px; color: var(--gray-400); margin-left: auto; }
+.pedido-data { font-size: 12px; color: var(--gray-400); }
+.pedido-obs { font-size: 12px; color: var(--gray-500); font-style: italic; padding: 0 16px 10px; }
+ 
+.status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px;
+  background: white; color: var(--gray-700); cursor: pointer; outline: none; }
+ 
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+.empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+ 
+/* CONFIG */
+.config-box { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 14px; }
+.config-box label { font-size: 12px; font-weight: 600; color: var(--gray-600); display: block; margin-bottom: 6px; }
+.config-box input { font-size: 13px; font-family: 'DM Mono', monospace; }
+.config-note { font-size: 12px; color: var(--gray-400); line-height: 1.5; margin-top: 8px; }
+.config-note a { color: var(--green); text-decoration: none; }
+ 
+/* TOAST */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--gray-900); color: white; font-size: 13px; font-weight: 500;
+  padding: 10px 20px; border-radius: 20px; z-index: 999; transition: transform 0.25s; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+ 
+/* HIDDEN */
+.page { display: none; }
+.page.active { display: block; }
+ 
+/* LOADING */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+ 
+.info-banner { background: var(--blue-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm);
+  padding: 12px 14px; font-size: 12px; color: #1e40af; line-height: 1.6; margin-bottom: 14px; }
+.info-banner strong { font-weight: 600; }
+</style>
+</head>
+<body>
+ 
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      Caçamba <span>Solicitações</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('form')">Solicitar</button>
+      <button class="nav-tab" onclick="showPage('gestao')">Gestão</button>
+      <button class="nav-tab" onclick="showPage('config')">Config</button>
+    </div>
+  </div>
+</nav>
+ 
+<main>
+ 
+<!-- ══ PÁGINA: FORMULÁRIO ══════════════════════════════════════════ -->
+<div id="page-form" class="page active">
+ 
+  <div class="card">
+    <div class="card-header">
+      <h2>Nova solicitação</h2>
+      <p>Preencha em menos de 1 minuto</p>
+    </div>
+    <div class="card-body" id="form-content">
+ 
+      <div class="field">
+        <label>Comprador <span class="req">*</span></label>
+        <div class="chips" id="chips-comprador">
+          <div class="chip" onclick="pick(this,'comprador')">Alex</div>
+          <div class="chip" onclick="pick(this,'comprador')">Ana</div>
+          <div class="chip" onclick="pick(this,'comprador')">Daniela</div>
+          <div class="chip" onclick="pick(this,'comprador')">Kezia</div>
+          <div class="chip" onclick="pick(this,'comprador')">Mauricio</div>
+          <div class="chip" onclick="pick(this,'comprador')">Maximo</div>
+          <div class="chip" onclick="pick(this,'comprador')">Sandro</div>
+          <div class="chip" onclick="pick(this,'comprador')">Valmir</div>
+          <div class="chip" onclick="pick(this,'comprador')">Valtinho</div>
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label>Tipo de caçamba <span class="req">*</span></label>
+        <div class="chips" id="chips-tipo">
+          <div class="chip" onclick="pick(this,'tipo')">Rollon</div>
+          <div class="chip" onclick="pick(this,'tipo')">Polly simples</div>
+          <div class="chip" onclick="pick(this,'tipo')">Polly duplo</div>
+          <div class="chip" onclick="pick(this,'tipo')">Munck</div>
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label>Serviço <span class="req">*</span></label>
+        <div class="chips" id="chips-servico">
+          <div class="chip" onclick="pick(this,'servico')">Troca</div>
+          <div class="chip" onclick="pick(this,'servico')">Retira</div>
+          <div class="chip" onclick="pick(this,'servico')">Coloca</div>
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label>Tipo de resíduo <span class="req">*</span></label>
+        <div class="chips" id="chips-residuo">
+          <div class="chip" onclick="multi(this)">Sucata</div>
+          <div class="chip" onclick="multi(this)">Madeira</div>
+          <div class="chip" onclick="multi(this)">Plástico</div>
+          <div class="chip" onclick="multi(this)">Papelão</div>
+          <div class="chip" onclick="multi(this)">Misto</div>
+          <div class="chip" onclick="multi(this)">Cavaco</div>
+          <div class="chip" onclick="multi(this)">Alumínio</div>
+          <div class="chip" onclick="multi(this)">Ecológica</div>
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label>Cliente <span class="req">*</span></label>
+        <input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" />
+      </div>
+ 
+      <div class="field">
+        <label>Cidade <span class="req">*</span></label>
+        <input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" />
+      </div>
+ 
+      <div class="field">
+        <label>Data necessária <span class="req">*</span></label>
+        <input type="date" id="f-data" />
+      </div>
+ 
+      <div class="field">
+        <label>Observação</label>
+        <textarea id="f-obs" placeholder="Julieta, plataforma, com rodas, horário específico…"></textarea>
+      </div>
+ 
+      <button class="btn" id="btn-enviar" onclick="enviar()">Enviar solicitação</button>
+    </div>
+ 
+    <div class="success-box" id="success-box">
+      <div class="success-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <h3>Solicitação enviada!</h3>
+      <p>A equipe já recebeu seu pedido.</p>
+      <button class="btn btn-outline" onclick="resetForm()" style="max-width:200px;margin:0 auto;">Nova solicitação</button>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- ══ PÁGINA: GESTÃO ══════════════════════════════════════════════ -->
+<div id="page-gestao" class="page">
+ 
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-body" style="padding:14px 16px">
+      <div class="filter-row">
+        <span class="filter-label">Status:</span>
+        <div class="filter-chip on" onclick="filtrar(this,'todos')">Todos</div>
+        <div class="filter-chip" onclick="filtrar(this,'Pendente')">Pendente</div>
+        <div class="filter-chip" onclick="filtrar(this,'Agendado')">Agendado</div>
+        <div class="filter-chip" onclick="filtrar(this,'Concluído')">Concluído</div>
+        <div class="filter-chip" onclick="filtrar(this,'Cancelado')">Cancelado</div>
+        <button class="btn btn-outline btn-sm" onclick="carregarPedidos()" style="margin-left:auto">↻ Atualizar</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="lista-pedidos">
+    <div class="empty-state">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+      <p>Configure o Google Sheets na aba Config<br>e clique em Atualizar para ver os pedidos.</p>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- ══ PÁGINA: CONFIG ══════════════════════════════════════════════ -->
+<div id="page-config" class="page">
+ 
+  <div class="card">
+    <div class="card-header">
+      <h2>Configuração do Google Sheets</h2>
+      <p>Conecte o app à sua planilha de respostas</p>
+    </div>
+    <div class="card-body">
+ 
+      <div class="info-banner">
+        <strong>Como obter o ID da planilha:</strong><br>
+        Abra a planilha "Solicitações de Caçamba — Respostas" no Google Drive.<br>
+        Copie o trecho entre <code>/d/</code> e <code>/edit</code> na URL.<br>
+        Exemplo: <code>docs.google.com/spreadsheets/d/<strong>1ABC...XYZ</strong>/edit</code>
+      </div>
+ 
+      <div class="config-box">
+        <label>ID da Planilha Google Sheets</label>
+        <input type="text" id="cfg-sheet-id" placeholder="Cole aqui o ID da planilha" />
+      </div>
+ 
+      <div class="config-box">
+        <label>URL do Google Apps Script (Web App)</label>
+        <input type="text" id="cfg-script-url" placeholder="https://script.google.com/macros/s/.../exec" />
+        <p class="config-note">
+          Para enviar dados direto ao Sheets, você precisa publicar um Web App no Apps Script.<br>
+          <a href="#" onclick="showScriptInstructions()">Como criar o Web App →</a>
+        </p>
+      </div>
+ 
+      <button class="btn" onclick="salvarConfig()">Salvar configuração</button>
+ 
+      <div id="script-instructions" style="display:none;margin-top:16px">
+        <div class="info-banner">
+          <strong>Passo a passo para criar o Web App:</strong><br><br>
+          1. Acesse <a href="https://script.google.com" target="_blank">script.google.com</a><br>
+          2. Crie um novo projeto e cole o código abaixo<br>
+          3. Clique em <strong>Implantar → Nova implantação</strong><br>
+          4. Tipo: <strong>App da Web</strong> | Executar como: <strong>Eu</strong> | Acesso: <strong>Qualquer pessoa</strong><br>
+          5. Copie a URL gerada e cole no campo acima
+        </div>
+        <div style="background:#1a1a1a;border-radius:8px;padding:14px;margin-top:8px;overflow-x:auto">
+          <pre style="font-family:'DM Mono',monospace;font-size:11px;color:#a8ff78;white-space:pre-wrap">function doPost(e) {
+  var sheet = SpreadsheetApp.openById('SEU_ID_AQUI')
+    .getSheetByName('Solicitações') || 
+    SpreadsheetApp.openById('SEU_ID_AQUI').getSheets()[0];
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    new Date(), data.comprador, data.tipo,
+    data.servico, data.residuo, data.cliente,
+    data.cidade, data.data, data.obs, 'Pendente'
+  ]);
+  return ContentService.createTextOutput('OK');
+}
+ 
+function doGet(e) {
+  var sheet = SpreadsheetApp.openById('SEU_ID_AQUI')
+    .getSheets()[0];
+  var rows = sheet.getDataRange().getValues();
+  var result = rows.slice(1).map(function(r) {
+    return {
+      timestamp: r[0], comprador: r[1], tipo: r[2],
+      servico: r[3], residuo: r[4], cliente: r[5],
+      cidade: r[6], data: r[7], obs: r[8], status: r[9]||'Pendente'
+    };
+  });
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+ 
+</div>
+ 
+</main>
+ 
+<div class="toast" id="toast"></div>
+ 
+<script>
+var sel = { comprador:'', tipo:'', servico:'' };
+var filtroAtivo = 'todos';
+var pedidosData = [];
+ 
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('page-'+p).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (p === 'gestao') carregarPedidos();
+}
+ 
+function pick(el, group) {
+  document.querySelectorAll('#chips-'+group+' .chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  sel[group] = el.textContent;
+}
+ 
+function multi(el) { el.classList.toggle('on'); }
+ 
+function getResiduo() {
+  return Array.from(document.querySelectorAll('#chips-residuo .chip.on'))
+    .map(function(c){ return c.textContent; }).join(', ');
+}
+ 
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+ 
+function enviar() {
+  if (!sel.comprador) { toast('Selecione o comprador'); return; }
+  if (!sel.tipo) { toast('Selecione o tipo de caçamba'); return; }
+  if (!sel.servico) { toast('Selecione o serviço'); return; }
+  if (!getResiduo()) { toast('Selecione o tipo de resíduo'); return; }
+  var cliente = document.getElementById('f-cliente').value.trim();
+  var cidade = document.getElementById('f-cidade').value.trim();
+  var data = document.getElementById('f-data').value;
+  if (!cliente) { toast('Informe o cliente'); return; }
+  if (!cidade) { toast('Informe a cidade'); return; }
+  if (!data) { toast('Selecione a data'); return; }
+ 
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enviando…';
+ 
+  var payload = {
+    comprador: sel.comprador, tipo: sel.tipo, servico: sel.servico,
+    residuo: getResiduo(), cliente: cliente, cidade: cidade,
+    data: data, obs: document.getElementById('f-obs').value.trim()
+  };
+ 
+  var scriptUrl = localStorage.getItem('cfg-script-url');
+ 
+  if (scriptUrl) {
+    fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(function() {
+      showSuccess();
+    }).catch(function() {
+      salvarLocal(payload);
+      showSuccess();
+    });
+  } else {
+    salvarLocal(payload);
+    setTimeout(showSuccess, 800);
+  }
+}
+ 
+function salvarLocal(payload) {
+  var lista = JSON.parse(localStorage.getItem('pedidos-local') || '[]');
+  payload.timestamp = new Date().toISOString();
+  payload.status = 'Pendente';
+  lista.unshift(payload);
+  localStorage.setItem('pedidos-local', JSON.stringify(lista));
+}
+ 
+function showSuccess() {
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-box').style.display = 'block';
+}
+ 
+function resetForm() {
+  document.getElementById('form-content').style.display = 'block';
+  document.getElementById('success-box').style.display = 'none';
+  document.querySelectorAll('.chip.on').forEach(function(c){ c.classList.remove('on'); });
+  sel = { comprador:'', tipo:'', servico:'' };
+  ['f-cliente','f-cidade','f-data','f-obs'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('btn-enviar').disabled = false;
+  document.getElementById('btn-enviar').textContent = 'Enviar solicitação';
+}
+ 
+function carregarPedidos() {
+  var scriptUrl = localStorage.getItem('cfg-script-url');
+  var local = JSON.parse(localStorage.getItem('pedidos-local') || '[]');
+ 
+  if (scriptUrl) {
+    document.getElementById('lista-pedidos').innerHTML = '<div class="empty-state"><p>Carregando…</p></div>';
+    fetch(scriptUrl).then(function(r){ return r.json(); }).then(function(data) {
+      pedidosData = data.concat(local);
+      renderPedidos();
+    }).catch(function() {
+      pedidosData = local;
+      renderPedidos();
+    });
+  } else {
+    pedidosData = local;
+    renderPedidos();
+  }
+}
+ 
+function renderPedidos() {
+  var lista = filtroAtivo === 'todos'
+    ? pedidosData
+    : pedidosData.filter(function(p){ return (p.status||'Pendente') === filtroAtivo; });
+ 
+  if (!lista.length) {
+    document.getElementById('lista-pedidos').innerHTML =
+      '<div class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><p>Nenhum pedido encontrado.</p></div>';
+    return;
+  }
+ 
+  var html = '';
+  lista.forEach(function(p, i) {
+    var st = p.status || 'Pendente';
+    var bc = 'badge-'+(st === 'Concluído' ? 'concluido' : st === 'Agendado' ? 'agendado' : st === 'Cancelado' ? 'cancelado' : 'pendente');
+    var dt = p.data ? p.data : '';
+    html += '<div class="pedido-card">';
+    html += '<div class="pedido-header">';
+    html += '<div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
+    html += '<span class="badge '+bc+'">'+st+'</span>';
+    html += '</div>';
+    html += '<div class="pedido-body">';
+    html += '<span class="pedido-tag">'+p.tipo+'</span>';
+    html += '<span class="pedido-tag">'+p.servico+'</span>';
+    html += '<span class="pedido-tag">'+p.residuo+'</span>';
+    if (dt) html += '<span class="pedido-data">'+dt+'</span>';
+    html += '<span class="pedido-comprador">'+p.comprador+'</span>';
+    html += '<select class="status-select" onchange="mudarStatus('+i+',this.value)">';
+    ['Pendente','Agendado','Concluído','Cancelado'].forEach(function(s){
+      html += '<option'+(s===st?' selected':'')+'>'+s+'</option>';
+    });
+    html += '</select>';
+    html += '</div>';
+    if (p.obs) html += '<div class="pedido-obs">'+p.obs+'</div>';
+    html += '</div>';
+  });
+  document.getElementById('lista-pedidos').innerHTML = html;
+}
+ 
+function mudarStatus(idx, novoStatus) {
+  pedidosData[idx].status = novoStatus;
+  var local = JSON.parse(localStorage.getItem('pedidos-local') || '[]');
+  var p = pedidosData[idx];
+  var li = local.findIndex(function(l){ return l.timestamp === p.timestamp && l.cliente === p.cliente; });
+  if (li >= 0) { local[li].status = novoStatus; localStorage.setItem('pedidos-local', JSON.stringify(local)); }
+  toast('Status atualizado: '+novoStatus);
+  renderPedidos();
+}
+ 
+function filtrar(el, status) {
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  filtroAtivo = status;
+  renderPedidos();
+}
+ 
+function salvarConfig() {
+  var sid = document.getElementById('cfg-sheet-id').value.trim();
+  var surl = document.getElementById('cfg-script-url').value.trim();
+  if (sid) localStorage.setItem('cfg-sheet-id', sid);
+  if (surl) localStorage.setItem('cfg-script-url', surl);
+  toast('Configuração salva!');
+}
+ 
+function showScriptInstructions() {
+  var el = document.getElementById('script-instructions');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+ 
+window.onload = function() {
+  var sid = localStorage.getItem('cfg-sheet-id');
+  var surl = localStorage.getItem('cfg-script-url');
+  if (sid) document.getElementById('cfg-sheet-id').value = sid;
+  if (surl) document.getElementById('cfg-script-url').value = surl;
+  var hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('f-data').value = hoje;
+};
+</script>
+</body>
+</html>
