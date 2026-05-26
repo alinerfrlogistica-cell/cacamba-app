@@ -10,6 +10,7 @@
   --green: #1a7f3c; --green-light: #e8f5ee;
   --red: #dc2626; --amber: #d97706; --amber-light: #fffbeb;
   --blue: #2563eb; --blue-light: #eff6ff;
+  --purple: #7c3aed; --purple-light: #f3e8ff;
   --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
   --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
   --gray-600: #4b5563; --gray-700: #374151; --gray-900: #111827;
@@ -44,12 +45,14 @@ main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
 .chip { padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--gray-200); background: white; color: var(--gray-600); cursor: pointer; transition: all 0.12s; user-select: none; }
 .chip:hover { border-color: var(--green); color: var(--green); }
 .chip.on { background: var(--green); color: white; border-color: var(--green); }
+.chip.on:hover { background: #15692f; }
 input[type=text], input[type=date], input[type=password], textarea, select {
   width: 100%; padding: 10px 12px; font-family: 'DM Sans', sans-serif;
   font-size: 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
   background: var(--gray-50); color: var(--gray-900); outline: none; transition: border 0.15s;
 }
 input:focus, textarea:focus, select:focus { border-color: var(--green); background: white; }
+input:disabled { background: var(--gray-100); color: var(--gray-400); cursor: not-allowed; }
 textarea { resize: vertical; min-height: 70px; }
 .btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
 .btn:hover { background: #15692f; }
@@ -75,8 +78,7 @@ textarea { resize: vertical; min-height: 70px; }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .badge-pendente { background: var(--amber-light); color: var(--amber); }
 .badge-agendado { background: var(--blue-light); color: var(--blue); }
-.badge-concluido { background: var(--green-light); color: var(--green); }
-.badge-cancelado { background: var(--gray-100); color: var(--gray-500); }
+.badge-reagendado { background: var(--purple-light); color: var(--purple); }
 .pedido-body { padding: 10px 16px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .pedido-tag { font-size: 12px; color: var(--gray-600); background: var(--gray-100); border-radius: 5px; padding: 3px 8px; font-family: 'DM Mono', monospace; }
 .pedido-comprador { font-size: 12px; color: var(--gray-400); margin-left: auto; }
@@ -96,7 +98,12 @@ textarea { resize: vertical; min-height: 70px; }
 .login-box .card-header { text-align: center; }
 .erro-login { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; display: none; }
 .badge-admin { background: #f3e8ff; color: #7c3aed; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; margin-left: 6px; }
-.saving { opacity: 0.6; pointer-events: none; }
+.disponibilidade-box { margin-top: 8px; font-size: 12px; padding: 8px 12px; border-radius: var(--radius-sm); display: none; }
+.disp-ok { background: var(--green-light); color: var(--green); }
+.disp-lotado { background: #fef2f2; color: var(--red); }
+.disp-aviso { background: var(--amber-light); color: var(--amber); }
+.wpp-btn { display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: white; border: none; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-left: 8px; }
+.wpp-btn:hover { background: #1ebe5a; }
 </style>
 </head>
 <body>
@@ -168,7 +175,11 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
       <div class="field"><label>Cliente <span class="req">*</span></label><input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" /></div>
       <div class="field"><label>Cidade <span class="req">*</span></label><input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" /></div>
-      <div class="field"><label>Data necessária <span class="req">*</span></label><input type="date" id="f-data" /></div>
+      <div class="field">
+        <label>Data necessária <span class="req">*</span></label>
+        <input type="date" id="f-data" onchange="verificarDisponibilidade()" />
+        <div class="disponibilidade-box" id="disp-box"></div>
+      </div>
       <div class="field"><label>Observação</label><textarea id="f-obs" placeholder="Julieta, plataforma, com rodas, horário específico…"></textarea></div>
       <button class="btn" id="btn-enviar" onclick="enviar()">Enviar solicitação</button>
     </div>
@@ -217,8 +228,7 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="filter-chip on" onclick="filtrar(this,'todos')">Todos</div>
         <div class="filter-chip" onclick="filtrar(this,'Pendente')">Pendente</div>
         <div class="filter-chip" onclick="filtrar(this,'Agendado')">Agendado</div>
-        <div class="filter-chip" onclick="filtrar(this,'Concluído')">Concluído</div>
-        <div class="filter-chip" onclick="filtrar(this,'Cancelado')">Cancelado</div>
+        <div class="filter-chip" onclick="filtrar(this,'Reagendado')">Reagendado</div>
         <button class="btn btn-outline btn-sm" onclick="carregarPedidos()" style="margin-left:auto">↻ Atualizar</button>
       </div>
     </div>
@@ -238,11 +248,24 @@ var SENHAS = {
   'Gestão':'logis123'
 };
 
+var WHATSAPP = {
+  'Alex':    '5519998259118',
+  'Ana':     '5519991671942',
+  'Daniela': '5519999384241',
+  'Kezia':   '5519989351385',
+  'Mauricio':'5519997711695',
+  'Maximo':  '5519989328913',
+  'Sandro':  '5519983850777',
+  'Valmir':  '5519981549239',
+  'Valtinho':'5519981389317'
+};
+
 var sel = { comprador:'', tipo:'', servico:'' };
 var filtroAtivo = 'todos';
 var pedidosData = [];
 var usuarioLogado = null;
 var isAdmin = false;
+var dataLotada = false;
 
 function showPage(p, tab) {
   document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
@@ -290,17 +313,60 @@ function logout() {
 function pick(el, group) {
   document.querySelectorAll('#chips-'+group+' .chip').forEach(function(c){ c.classList.remove('on'); });
   el.classList.add('on'); sel[group] = el.textContent;
+  if (group === 'tipo') verificarDisponibilidade();
 }
+
 function multi(el) { el.classList.toggle('on'); }
+
 function getResiduo() {
   return Array.from(document.querySelectorAll('#chips-residuo .chip.on')).map(function(c){ return c.textContent; }).join(', ');
 }
+
 function toast(msg) {
   var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function verificarDisponibilidade() {
+  var tipo = sel.tipo;
+  var data = document.getElementById('f-data').value;
+  var box = document.getElementById('disp-box');
+  var btn = document.getElementById('btn-enviar');
+
+  if (!tipo || !data) { box.style.display='none'; return; }
+
+  box.style.display = 'block';
+  box.className = 'disponibilidade-box';
+  box.textContent = 'Verificando disponibilidade…';
+  dataLotada = false;
+
+  fetch(SCRIPT_URL + '?acao=verificar_disponibilidade&tipo=' + encodeURIComponent(tipo) + '&data=' + data)
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.disponivel) {
+        if (d.vagas <= 3) {
+          box.className = 'disponibilidade-box disp-aviso';
+          box.textContent = '⚠️ Apenas ' + d.vagas + ' vaga(s) restante(s) nessa data!';
+        } else {
+          box.className = 'disponibilidade-box disp-ok';
+          box.textContent = '✅ ' + d.vagas + ' vaga(s) disponível(is) nessa data.';
+        }
+        dataLotada = false;
+        btn.disabled = false;
+        btn.textContent = 'Enviar solicitação';
+      } else {
+        box.className = 'disponibilidade-box disp-lotado';
+        box.textContent = '🚫 Data lotada para ' + tipo + '! Escolha outra data.';
+        dataLotada = true;
+        btn.disabled = true;
+        btn.textContent = 'Data indisponível';
+      }
+    })
+    .catch(function() { box.style.display='none'; dataLotada = false; });
 }
 
 function enviar() {
+  if (dataLotada) { toast('Data lotada! Escolha outra data.'); return; }
   if (!sel.comprador) { toast('Selecione o comprador'); return; }
   if (!sel.tipo) { toast('Selecione o tipo de caçamba'); return; }
   if (!sel.servico) { toast('Selecione o serviço'); return; }
@@ -311,10 +377,17 @@ function enviar() {
   if (!cliente) { toast('Informe o cliente'); return; }
   if (!cidade) { toast('Informe a cidade'); return; }
   if (!data) { toast('Selecione a data'); return; }
+
   var btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Enviando…';
-  var payload = { comprador:sel.comprador, tipo:sel.tipo, servico:sel.servico, residuo:getResiduo(), cliente:cliente, cidade:cidade, data:data, obs:document.getElementById('f-obs').value.trim() };
+
+  var payload = {
+    comprador: sel.comprador, tipo: sel.tipo, servico: sel.servico,
+    residuo: getResiduo(), cliente: cliente, cidade: cidade,
+    data: data, obs: document.getElementById('f-obs').value.trim()
+  };
+
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
     .then(function(){ showSuccess(); })
     .catch(function(){ toast('Erro ao enviar. Tente novamente.'); btn.disabled=false; btn.textContent='Enviar solicitação'; });
@@ -333,7 +406,9 @@ function resetForm() {
   ['f-cliente','f-cidade','f-data','f-obs'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('btn-enviar').disabled = false;
   document.getElementById('btn-enviar').textContent = 'Enviar solicitação';
+  document.getElementById('disp-box').style.display = 'none';
   document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  dataLotada = false;
 }
 
 function carregarPedidos() {
@@ -353,18 +428,23 @@ function renderPedidos() {
   var html = '';
   lista.forEach(function(p, i) {
     var st = p.status || 'Pendente';
-    var bc = 'badge-'+(st==='Concluído'?'concluido':st==='Agendado'?'agendado':st==='Cancelado'?'cancelado':'pendente');
-    html += '<div class="pedido-card" id="card-'+i+'">';
+    var bc = st==='Agendado'?'badge-agendado':st==='Reagendado'?'badge-reagendado':'badge-pendente';
+    html += '<div class="pedido-card">';
     html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
     html += '<span class="badge '+bc+'" id="badge-'+i+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
     if (p.data) html += '<span class="pedido-data">'+p.data+'</span>';
-    if (isAdmin) html += '<span class="pedido-comprador">'+p.comprador+'</span>';
     if (isAdmin) {
-      html += '<select class="status-select" id="sel-'+i+'" onchange="mudarStatus('+i+',this.value,'+p.id+')">';
-      ['Pendente','Agendado','Concluído','Cancelado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
+      html += '<span class="pedido-comprador">'+p.comprador+'</span>';
+      html += '<select class="status-select" id="sel-'+i+'" onchange="mudarStatus('+i+',this.value,'+p.id+',\''+p.comprador+'\',\''+p.cliente+'\',\''+p.data+'\')">';
+      ['Pendente','Agendado','Reagendado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
       html += '</select>';
+      if (WHATSAPP[p.comprador]) {
+        html += '<button class="wpp-btn" onclick="abrirWhatsApp(\''+p.comprador+'\',\''+st+'\',\''+p.cliente+'\',\''+p.data+'\',\''+p.tipo+'\')">';
+        html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp';
+        html += '</button>';
+      }
     }
     html += '</div>';
     if (p.obs) html += '<div class="pedido-obs">'+p.obs+'</div>';
@@ -373,18 +453,36 @@ function renderPedidos() {
   document.getElementById('lista-pedidos').innerHTML = html;
 }
 
-function mudarStatus(idx, novoStatus, linhaId) {
-  // Atualiza visualmente
+function mudarStatus(idx, novoStatus, linhaId, comprador, cliente, data) {
   pedidosData[idx].status = novoStatus;
-  var bc = 'badge-'+(novoStatus==='Concluído'?'concluido':novoStatus==='Agendado'?'agendado':novoStatus==='Cancelado'?'cancelado':'pendente');
+  var bc = novoStatus==='Agendado'?'badge-agendado':novoStatus==='Reagendado'?'badge-reagendado':'badge-pendente';
   var badge = document.getElementById('badge-'+idx);
   if (badge) { badge.className = 'badge '+bc; badge.textContent = novoStatus; }
 
-  // Envia para planilha
   var payload = { acao: 'atualizar_status', id: linhaId, status: novoStatus };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
-    .then(function(){ toast('Status atualizado: ' + novoStatus); })
+    .then(function(){
+      toast('Status atualizado: ' + novoStatus);
+      // Abre WhatsApp automaticamente se Agendado ou Reagendado
+      if ((novoStatus === 'Agendado' || novoStatus === 'Reagendado') && WHATSAPP[comprador]) {
+        setTimeout(function(){ abrirWhatsApp(comprador, novoStatus, cliente, data, pedidosData[idx].tipo); }, 500);
+      }
+    })
     .catch(function(){ toast('Erro ao salvar status.'); });
+}
+
+function abrirWhatsApp(comprador, status, cliente, data, tipo) {
+  var numero = WHATSAPP[comprador];
+  if (!numero) return;
+  var dataFormatada = data ? data.split('-').reverse().join('/') : '';
+  var msg = '';
+  if (status === 'Agendado') {
+    msg = 'Olá ' + comprador + '! ✅ Seu pedido de *' + tipo + '* para o cliente *' + cliente + '* foi *AGENDADO* para o dia *' + dataFormatada + '*. Qualquer dúvida entre em contato.';
+  } else if (status === 'Reagendado') {
+    msg = 'Olá ' + comprador + '! ⚠️ Seu pedido de *' + tipo + '* para o cliente *' + cliente + '* foi *REAGENDADO*. Entraremos em contato para confirmar a nova data. Pedimos desculpas pelo inconveniente.';
+  }
+  var url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
 }
 
 function filtrar(el, status) {
