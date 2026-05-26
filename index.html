@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green: #1a7f3c; --green-light: #e8f5ee; --green-mid: #c3e6d0;
-  --red: #dc2626; --red-light: #fef2f2; --amber: #d97706; --amber-light: #fffbeb;
+  --green: #1a7f3c; --green-light: #e8f5ee;
+  --red: #dc2626; --amber: #d97706; --amber-light: #fffbeb;
   --blue: #2563eb; --blue-light: #eff6ff;
   --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
   --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
@@ -19,7 +19,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: var(--gray-900); min-height: 100vh; }
-nav { background: var(--green); padding: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+nav { background: var(--green); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .nav-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: stretch; padding: 0 16px; }
 .nav-logo { color: white; font-size: 15px; font-weight: 600; padding: 14px 0; margin-right: auto; display: flex; align-items: center; gap: 8px; }
 .nav-logo span { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 8px; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; }
@@ -27,10 +27,13 @@ nav { background: var(--green); padding: 0; position: sticky; top: 0; z-index: 1
 .nav-tab { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; padding: 0 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; height: 100%; display: flex; align-items: center; }
 .nav-tab.active { color: white; border-bottom-color: white; }
 .nav-tab:hover { color: white; }
+.nav-user { color: rgba(255,255,255,0.9); font-size: 12px; display: flex; align-items: center; gap: 8px; padding: 0 4px; }
+.nav-user span { font-weight: 600; }
+.nav-user button { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 11px; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
 .card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
 .card-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--gray-100); }
-.card-header h2 { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+.card-header h2 { font-size: 15px; font-weight: 600; }
 .card-header p { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
 .card-body { padding: 16px 20px; }
 .field { margin-bottom: 18px; }
@@ -41,13 +44,12 @@ main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
 .chip { padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--gray-200); background: white; color: var(--gray-600); cursor: pointer; transition: all 0.12s; user-select: none; }
 .chip:hover { border-color: var(--green); color: var(--green); }
 .chip.on { background: var(--green); color: white; border-color: var(--green); }
-.chip.on:hover { background: #15692f; }
-input[type=text], input[type=date], textarea {
+input[type=text], input[type=date], input[type=password], textarea, select {
   width: 100%; padding: 10px 12px; font-family: 'DM Sans', sans-serif;
   font-size: 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
   background: var(--gray-50); color: var(--gray-900); outline: none; transition: border 0.15s;
 }
-input[type=text]:focus, input[type=date]:focus, textarea:focus { border-color: var(--green); background: white; }
+input:focus, textarea:focus, select:focus { border-color: var(--green); background: white; }
 textarea { resize: vertical; min-height: 70px; }
 .btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white;
   font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
@@ -67,10 +69,10 @@ textarea { resize: vertical; min-height: 70px; }
 .filter-chip { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); background: white; color: var(--gray-500); cursor: pointer; transition: all 0.12s; }
 .filter-chip.on { background: var(--gray-900); color: white; border-color: var(--gray-900); }
 .filter-label { font-size: 12px; color: var(--gray-400); margin-right: 2px; }
-.pedido-card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+.pedido-card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; }
 .pedido-card:hover { box-shadow: var(--shadow-md); }
 .pedido-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--gray-100); }
-.pedido-cliente { font-size: 14px; font-weight: 600; color: var(--gray-900); flex: 1; }
+.pedido-cliente { font-size: 14px; font-weight: 600; flex: 1; }
 .pedido-cidade { font-size: 12px; color: var(--gray-500); }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .badge-pendente { background: var(--amber-light); color: var(--amber); }
@@ -82,7 +84,7 @@ textarea { resize: vertical; min-height: 70px; }
 .pedido-comprador { font-size: 12px; color: var(--gray-400); margin-left: auto; }
 .pedido-data { font-size: 12px; color: var(--gray-400); }
 .pedido-obs { font-size: 12px; color: var(--gray-500); font-style: italic; padding: 0 16px 10px; }
-.status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px; background: white; color: var(--gray-700); cursor: pointer; outline: none; }
+.status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px; background: white; color: var(--gray-700); cursor: pointer; outline: none; width: auto; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
 .empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); margin-bottom: 12px; }
 .empty-state p { font-size: 13px; }
@@ -92,6 +94,10 @@ textarea { resize: vertical; min-height: 70px; }
 .page.active { display: block; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.login-box { max-width: 380px; margin: 40px auto 0; }
+.login-box .card-header { text-align: center; }
+.erro-login { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; display: none; }
+.badge-admin { background: #f3e8ff; color: #7c3aed; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -100,22 +106,23 @@ textarea { resize: vertical; min-height: 70px; }
   <div class="nav-inner">
     <div class="nav-logo">Caçamba <span>Solicitações</span></div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="showPage('form')">Solicitar</button>
-      <button class="nav-tab" onclick="showPage('gestao')">Gestão</button>
+      <button class="nav-tab active" id="tab-solicitar" onclick="showPage('form', this)">Solicitar</button>
+      <button class="nav-tab" id="tab-gestao" onclick="irParaGestao(this)">Gestão</button>
+    </div>
+    <div class="nav-user" id="nav-user" style="display:none">
+      <span id="nav-nome"></span>
+      <button onclick="logout()">Sair</button>
     </div>
   </div>
 </nav>
 
 <main>
 
+<!-- FORMULÁRIO -->
 <div id="page-form" class="page active">
   <div class="card">
-    <div class="card-header">
-      <h2>Nova solicitação</h2>
-      <p>Preencha em menos de 1 minuto</p>
-    </div>
+    <div class="card-header"><h2>Nova solicitação</h2><p>Preencha em menos de 1 minuto</p></div>
     <div class="card-body" id="form-content">
-
       <div class="field">
         <label>Comprador <span class="req">*</span></label>
         <div class="chips" id="chips-comprador">
@@ -130,7 +137,6 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="chip" onclick="pick(this,'comprador')">Valtinho</div>
         </div>
       </div>
-
       <div class="field">
         <label>Tipo de caçamba <span class="req">*</span></label>
         <div class="chips" id="chips-tipo">
@@ -140,7 +146,6 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="chip" onclick="pick(this,'tipo')">Munck</div>
         </div>
       </div>
-
       <div class="field">
         <label>Serviço <span class="req">*</span></label>
         <div class="chips" id="chips-servico">
@@ -149,7 +154,6 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="chip" onclick="pick(this,'servico')">Instalar</div>
         </div>
       </div>
-
       <div class="field">
         <label>Tipo de resíduo <span class="req">*</span></label>
         <div class="chips" id="chips-residuo">
@@ -163,34 +167,14 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="chip" onclick="multi(this)">Ecológica</div>
         </div>
       </div>
-
-      <div class="field">
-        <label>Cliente <span class="req">*</span></label>
-        <input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" />
-      </div>
-
-      <div class="field">
-        <label>Cidade <span class="req">*</span></label>
-        <input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" />
-      </div>
-
-      <div class="field">
-        <label>Data necessária <span class="req">*</span></label>
-        <input type="date" id="f-data" />
-      </div>
-
-      <div class="field">
-        <label>Observação</label>
-        <textarea id="f-obs" placeholder="Julieta, plataforma, com rodas, horário específico…"></textarea>
-      </div>
-
+      <div class="field"><label>Cliente <span class="req">*</span></label><input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" /></div>
+      <div class="field"><label>Cidade <span class="req">*</span></label><input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" /></div>
+      <div class="field"><label>Data necessária <span class="req">*</span></label><input type="date" id="f-data" /></div>
+      <div class="field"><label>Observação</label><textarea id="f-obs" placeholder="Julieta, plataforma, com rodas, horário específico…"></textarea></div>
       <button class="btn" id="btn-enviar" onclick="enviar()">Enviar solicitação</button>
     </div>
-
     <div class="success-box" id="success-box">
-      <div class="success-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-      </div>
+      <div class="success-icon"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div>
       <h3>Solicitação enviada!</h3>
       <p>A equipe já recebeu seu pedido.</p>
       <button class="btn btn-outline" onclick="resetForm()" style="max-width:200px;margin:0 auto;">Nova solicitação</button>
@@ -198,6 +182,34 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
+<!-- LOGIN -->
+<div id="page-login" class="page">
+  <div class="login-box">
+    <div class="card">
+      <div class="card-header"><h2>Acessar Gestão</h2><p>Entre com seu nome e senha</p></div>
+      <div class="card-body">
+        <div class="field">
+          <label>Nome</label>
+          <select id="login-nome">
+            <option value="">Selecione...</option>
+            <option>Alex</option><option>Ana</option><option>Daniela</option>
+            <option>Kezia</option><option>Mauricio</option><option>Maximo</option>
+            <option>Sandro</option><option>Valmir</option><option>Valtinho</option>
+            <option>Gestão</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="login-senha" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter') fazerLogin()" />
+        </div>
+        <button class="btn" onclick="fazerLogin()">Entrar</button>
+        <p class="erro-login" id="erro-login">Senha incorreta. Tente novamente.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GESTÃO -->
 <div id="page-gestao" class="page">
   <div class="card" style="margin-bottom:14px">
     <div class="card-body" style="padding:14px 16px">
@@ -212,52 +224,85 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
     </div>
   </div>
-  <div id="lista-pedidos">
-    <div class="empty-state">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-      <p>Clique em Atualizar para ver os pedidos.</p>
-    </div>
-  </div>
+  <div id="lista-pedidos"><div class="empty-state"><p>Carregando…</p></div></div>
 </div>
 
 </main>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIGURAÇÃO FIXA — funciona em qualquer dispositivo
-// ============================================================
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8kjRlCHRHwCea2I73sUQtloeCj55FMLgxUBt9SpSIMidpoD3Zas20LCz4AXSprEE/exec';
+
+var SENHAS = {
+  'Alex':'3847','Ana':'7291','Daniela':'5163','Kezia':'9438',
+  'Mauricio':'2784','Maximo':'6519','Sandro':'4072','Valmir':'8346','Valtinho':'1693',
+  'Gestão':'logis123'
+};
 
 var sel = { comprador:'', tipo:'', servico:'' };
 var filtroAtivo = 'todos';
 var pedidosData = [];
+var usuarioLogado = null;
+var isAdmin = false;
 
-function showPage(p) {
+function showPage(p, tab) {
   document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
-  document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
   document.getElementById('page-'+p).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if (p === 'gestao') carregarPedidos();
+  if (tab) {
+    document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
+    tab.classList.add('active');
+  }
+}
+
+function irParaGestao(tab) {
+  document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
+  tab.classList.add('active');
+  if (usuarioLogado) {
+    showPage('gestao');
+    carregarPedidos();
+  } else {
+    showPage('login');
+  }
+}
+
+function fazerLogin() {
+  var nome = document.getElementById('login-nome').value;
+  var senha = document.getElementById('login-senha').value;
+  var erro = document.getElementById('erro-login');
+  if (!nome) { erro.style.display='block'; erro.textContent='Selecione seu nome.'; return; }
+  if (SENHAS[nome] && SENHAS[nome] === senha) {
+    usuarioLogado = nome;
+    isAdmin = (nome === 'Gestão');
+    erro.style.display = 'none';
+    document.getElementById('login-senha').value = '';
+    document.getElementById('nav-user').style.display = 'flex';
+    document.getElementById('nav-nome').innerHTML = nome + (isAdmin ? '<span class="badge-admin">admin</span>' : '');
+    showPage('gestao');
+    carregarPedidos();
+  } else {
+    erro.style.display = 'block';
+    document.getElementById('login-senha').value = '';
+  }
+}
+
+function logout() {
+  usuarioLogado = null; isAdmin = false;
+  document.getElementById('nav-user').style.display = 'none';
+  document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('tab-solicitar').classList.add('active');
+  showPage('form');
 }
 
 function pick(el, group) {
   document.querySelectorAll('#chips-'+group+' .chip').forEach(function(c){ c.classList.remove('on'); });
-  el.classList.add('on');
-  sel[group] = el.textContent;
+  el.classList.add('on'); sel[group] = el.textContent;
 }
-
 function multi(el) { el.classList.toggle('on'); }
-
 function getResiduo() {
-  return Array.from(document.querySelectorAll('#chips-residuo .chip.on'))
-    .map(function(c){ return c.textContent; }).join(', ');
+  return Array.from(document.querySelectorAll('#chips-residuo .chip.on')).map(function(c){ return c.textContent; }).join(', ');
 }
-
 function toast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
@@ -272,28 +317,13 @@ function enviar() {
   if (!cliente) { toast('Informe o cliente'); return; }
   if (!cidade) { toast('Informe a cidade'); return; }
   if (!data) { toast('Selecione a data'); return; }
-
   var btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Enviando…';
-
-  var payload = {
-    comprador: sel.comprador, tipo: sel.tipo, servico: sel.servico,
-    residuo: getResiduo(), cliente: cliente, cidade: cidade,
-    data: data, obs: document.getElementById('f-obs').value.trim()
-  };
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    mode: 'no-cors'
-  }).then(function() {
-    showSuccess();
-  }).catch(function() {
-    toast('Erro ao enviar. Tente novamente.');
-    btn.disabled = false;
-    btn.textContent = 'Enviar solicitação';
-  });
+  var payload = { comprador:sel.comprador, tipo:sel.tipo, servico:sel.servico, residuo:getResiduo(), cliente:cliente, cidade:cidade, data:data, obs:document.getElementById('f-obs').value.trim() };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
+    .then(function(){ showSuccess(); })
+    .catch(function(){ toast('Erro ao enviar. Tente novamente.'); btn.disabled=false; btn.textContent='Enviar solicitação'; });
 }
 
 function showSuccess() {
@@ -306,52 +336,42 @@ function resetForm() {
   document.getElementById('success-box').style.display = 'none';
   document.querySelectorAll('.chip.on').forEach(function(c){ c.classList.remove('on'); });
   sel = { comprador:'', tipo:'', servico:'' };
-  ['f-cliente','f-cidade','f-data','f-obs'].forEach(function(id){
-    document.getElementById(id).value = '';
-  });
+  ['f-cliente','f-cidade','f-data','f-obs'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('btn-enviar').disabled = false;
   document.getElementById('btn-enviar').textContent = 'Enviar solicitação';
-  var hoje = new Date().toISOString().split('T')[0];
-  document.getElementById('f-data').value = hoje;
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
 }
 
 function carregarPedidos() {
   document.getElementById('lista-pedidos').innerHTML = '<div class="empty-state"><p>Carregando…</p></div>';
   fetch(SCRIPT_URL).then(function(r){ return r.json(); }).then(function(data) {
-    pedidosData = data;
+    pedidosData = isAdmin ? data : data.filter(function(p){ return p.comprador === usuarioLogado; });
     renderPedidos();
-  }).catch(function() {
-    pedidosData = [];
-    renderPedidos();
-  });
+  }).catch(function(){ pedidosData = []; renderPedidos(); });
 }
 
 function renderPedidos() {
-  var lista = filtroAtivo === 'todos'
-    ? pedidosData
-    : pedidosData.filter(function(p){ return (p.status||'Pendente') === filtroAtivo; });
-
+  var lista = filtroAtivo === 'todos' ? pedidosData : pedidosData.filter(function(p){ return (p.status||'Pendente') === filtroAtivo; });
   if (!lista.length) {
-    document.getElementById('lista-pedidos').innerHTML =
-      '<div class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><p>Nenhum pedido encontrado.</p></div>';
+    document.getElementById('lista-pedidos').innerHTML = '<div class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><p>Nenhum pedido encontrado.</p></div>';
     return;
   }
-
   var html = '';
   lista.forEach(function(p, i) {
     var st = p.status || 'Pendente';
-    var bc = 'badge-'+(st === 'Concluído' ? 'concluido' : st === 'Agendado' ? 'agendado' : st === 'Cancelado' ? 'cancelado' : 'pendente');
+    var bc = 'badge-'+(st==='Concluído'?'concluido':st==='Agendado'?'agendado':st==='Cancelado'?'cancelado':'pendente');
     html += '<div class="pedido-card">';
-    html += '<div class="pedido-header">';
-    html += '<div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
-    html += '<span class="badge '+bc+'">'+st+'</span>';
-    html += '</div>';
+    html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
+    html += '<span class="badge '+bc+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
-    html += '<span class="pedido-tag">'+p.tipo+'</span>';
-    html += '<span class="pedido-tag">'+p.servico+'</span>';
-    html += '<span class="pedido-tag">'+p.residuo+'</span>';
+    html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
     if (p.data) html += '<span class="pedido-data">'+p.data+'</span>';
-    html += '<span class="pedido-comprador">'+p.comprador+'</span>';
+    if (isAdmin) html += '<span class="pedido-comprador">'+p.comprador+'</span>';
+    if (isAdmin) {
+      html += '<select class="status-select" onchange="mudarStatus('+i+',this.value)">';
+      ['Pendente','Agendado','Concluído','Cancelado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
+      html += '</select>';
+    }
     html += '</div>';
     if (p.obs) html += '<div class="pedido-obs">'+p.obs+'</div>';
     html += '</div>';
@@ -359,16 +379,19 @@ function renderPedidos() {
   document.getElementById('lista-pedidos').innerHTML = html;
 }
 
-function filtrar(el, status) {
-  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('on'); });
-  el.classList.add('on');
-  filtroAtivo = status;
+function mudarStatus(idx, novoStatus) {
+  pedidosData[idx].status = novoStatus;
+  toast('Status atualizado: ' + novoStatus);
   renderPedidos();
 }
 
+function filtrar(el, status) {
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); filtroAtivo = status; renderPedidos();
+}
+
 window.onload = function() {
-  var hoje = new Date().toISOString().split('T')[0];
-  document.getElementById('f-data').value = hoje;
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
 };
 </script>
 </body>
