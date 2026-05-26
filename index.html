@@ -22,7 +22,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-100); color: v
 nav { background: var(--green); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .nav-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: stretch; padding: 0 16px; }
 .nav-logo { color: white; font-size: 15px; font-weight: 600; padding: 14px 0; margin-right: auto; display: flex; align-items: center; gap: 8px; }
-.nav-logo span { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 8px; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; }
+.nav-logo span { background: rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 8px; font-family: 'DM Mono', monospace; font-size: 12px; }
 .nav-tabs { display: flex; }
 .nav-tab { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; padding: 0 16px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; height: 100%; display: flex; align-items: center; }
 .nav-tab.active { color: white; border-bottom-color: white; }
@@ -51,9 +51,7 @@ input[type=text], input[type=date], input[type=password], textarea, select {
 }
 input:focus, textarea:focus, select:focus { border-color: var(--green); background: white; }
 textarea { resize: vertical; min-height: 70px; }
-.btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white;
-  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-  border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+.btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
 .btn:hover { background: #15692f; }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { background: var(--gray-300); cursor: not-allowed; }
@@ -98,6 +96,7 @@ textarea { resize: vertical; min-height: 70px; }
 .login-box .card-header { text-align: center; }
 .erro-login { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; display: none; }
 .badge-admin { background: #f3e8ff; color: #7c3aed; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; margin-left: 6px; }
+.saving { opacity: 0.6; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -231,7 +230,7 @@ textarea { resize: vertical; min-height: 70px; }
 <div class="toast" id="toast"></div>
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8kjRlCHRHwCea2I73sUQtloeCj55FMLgxUBt9SpSIMidpoD3Zas20LCz4AXSprEE/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVHdEnW0UtBc4vWP_Gzrcv5hPQ_mCRT1HDdJ65tJjzViFcLeEILddMWUlfc3aFddgW/exec';
 
 var SENHAS = {
   'Alex':'3847','Ana':'7291','Daniela':'5163','Kezia':'9438',
@@ -257,12 +256,8 @@ function showPage(p, tab) {
 function irParaGestao(tab) {
   document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
   tab.classList.add('active');
-  if (usuarioLogado) {
-    showPage('gestao');
-    carregarPedidos();
-  } else {
-    showPage('login');
-  }
+  if (usuarioLogado) { showPage('gestao'); carregarPedidos(); }
+  else { showPage('login'); }
 }
 
 function fazerLogin() {
@@ -271,8 +266,7 @@ function fazerLogin() {
   var erro = document.getElementById('erro-login');
   if (!nome) { erro.style.display='block'; erro.textContent='Selecione seu nome.'; return; }
   if (SENHAS[nome] && SENHAS[nome] === senha) {
-    usuarioLogado = nome;
-    isAdmin = (nome === 'Gestão');
+    usuarioLogado = nome; isAdmin = (nome === 'Gestão');
     erro.style.display = 'none';
     document.getElementById('login-senha').value = '';
     document.getElementById('nav-user').style.display = 'flex';
@@ -360,15 +354,15 @@ function renderPedidos() {
   lista.forEach(function(p, i) {
     var st = p.status || 'Pendente';
     var bc = 'badge-'+(st==='Concluído'?'concluido':st==='Agendado'?'agendado':st==='Cancelado'?'cancelado':'pendente');
-    html += '<div class="pedido-card">';
+    html += '<div class="pedido-card" id="card-'+i+'">';
     html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
-    html += '<span class="badge '+bc+'">'+st+'</span></div>';
+    html += '<span class="badge '+bc+'" id="badge-'+i+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
     if (p.data) html += '<span class="pedido-data">'+p.data+'</span>';
     if (isAdmin) html += '<span class="pedido-comprador">'+p.comprador+'</span>';
     if (isAdmin) {
-      html += '<select class="status-select" onchange="mudarStatus('+i+',this.value)">';
+      html += '<select class="status-select" id="sel-'+i+'" onchange="mudarStatus('+i+',this.value,'+p.id+')">';
       ['Pendente','Agendado','Concluído','Cancelado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
       html += '</select>';
     }
@@ -379,10 +373,18 @@ function renderPedidos() {
   document.getElementById('lista-pedidos').innerHTML = html;
 }
 
-function mudarStatus(idx, novoStatus) {
+function mudarStatus(idx, novoStatus, linhaId) {
+  // Atualiza visualmente
   pedidosData[idx].status = novoStatus;
-  toast('Status atualizado: ' + novoStatus);
-  renderPedidos();
+  var bc = 'badge-'+(novoStatus==='Concluído'?'concluido':novoStatus==='Agendado'?'agendado':novoStatus==='Cancelado'?'cancelado':'pendente');
+  var badge = document.getElementById('badge-'+idx);
+  if (badge) { badge.className = 'badge '+bc; badge.textContent = novoStatus; }
+
+  // Envia para planilha
+  var payload = { acao: 'atualizar_status', id: linhaId, status: novoStatus };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
+    .then(function(){ toast('Status atualizado: ' + novoStatus); })
+    .catch(function(){ toast('Erro ao salvar status.'); });
 }
 
 function filtrar(el, status) {
