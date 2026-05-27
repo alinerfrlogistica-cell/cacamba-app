@@ -479,7 +479,15 @@ function mudarStatus(idx, novoStatus, linhaId, comprador, cliente, data) {
 function abrirWhatsApp(comprador, status, cliente, data, tipo) {
   var numero = WHATSAPP[comprador];
   if (!numero) return;
-  var dataFormatada = data ? data.split('-').reverse().join('/') : '';
+  var dataFormatada = '';
+  if (data) {
+    var d = new Date(data);
+    if (!isNaN(d)) {
+      dataFormatada = ('0'+d.getUTCDate()).slice(-2) + '/' + ('0'+(d.getUTCMonth()+1)).slice(-2) + '/' + d.getUTCFullYear();
+    } else {
+      dataFormatada = String(data).split('-').reverse().join('/');
+    }
+  }
   var msg = '';
   if (status === 'Agendado') {
     msg = 'Olá ' + comprador + '! ✅ Seu pedido de *' + tipo + '* para o cliente *' + cliente + '* foi *AGENDADO* para o dia *' + dataFormatada + '*. Qualquer dúvida entre em contato.';
@@ -489,7 +497,6 @@ function abrirWhatsApp(comprador, status, cliente, data, tipo) {
   var url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
 }
-
 function filtrar(el, status) {
   document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('on'); });
   el.classList.add('on'); filtroAtivo = status; renderPedidos();
