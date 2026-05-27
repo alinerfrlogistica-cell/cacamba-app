@@ -148,7 +148,6 @@ textarea { resize: vertical; min-height: 70px; }
         <div class="chips" id="chips-tipo">
           <div class="chip" onclick="pick(this,'tipo')">Rollon</div>
           <div class="chip" onclick="pick(this,'tipo')">Polly</div>
-          
           <div class="chip" onclick="pick(this,'tipo')">Munck</div>
         </div>
       </div>
@@ -265,7 +264,7 @@ var filtroAtivo = 'todos';
 var pedidosData = [];
 var usuarioLogado = null;
 var isAdmin = false;
-var 
+var dataLotada = false;
 
 function showPage(p, tab) {
   document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
@@ -296,7 +295,7 @@ function fazerLogin() {
     document.getElementById('nav-nome').innerHTML = nome + (isAdmin ? '<span class="badge-admin">admin</span>' : '');
     showPage('gestao');
     carregarPedidos();
-  
+  } else {
     erro.style.display = 'block';
     document.getElementById('login-senha').value = '';
   }
@@ -338,7 +337,7 @@ function verificarDisponibilidade() {
   box.style.display = 'block';
   box.className = 'disponibilidade-box';
   box.textContent = 'Verificando disponibilidade…';
-  
+  dataLotada = false;
 
   fetch(SCRIPT_URL + '?acao=verificar_disponibilidade&tipo=' + encodeURIComponent(tipo) + '&data=' + data)
     .then(function(r){ return r.json(); })
@@ -402,7 +401,7 @@ function resetForm() {
   document.getElementById('btn-enviar').textContent = 'Enviar solicitação';
   document.getElementById('disp-box').style.display = 'none';
   document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
-  
+  dataLotada = false;
 }
 
 function carregarPedidos() {
