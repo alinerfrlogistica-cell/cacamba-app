@@ -381,9 +381,22 @@ function enviar() {
     data: data, obs: document.getElementById('f-obs').value.trim()
   };
 
-  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
-    .then(function(){ showSuccess(); })
-    .catch(function(){ toast('Erro ao enviar. Tente novamente.'); btn.disabled=false; btn.textContent='Enviar solicitação'; });
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(resp) {
+      if (resp.status === 'erro') {
+        toast('🚫 ' + resp.mensagem);
+        btn.disabled = false;
+        btn.textContent = 'Enviar solicitação';
+      } else {
+        showSuccess();
+      }
+    })
+    .catch(function(){
+      toast('Erro ao enviar. Tente novamente.');
+      btn.disabled = false;
+      btn.textContent = 'Enviar solicitação';
+    });
 }
 
 function showSuccess() {
@@ -456,7 +469,6 @@ function mudarStatus(idx, novoStatus, linhaId, comprador, cliente, data) {
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
     .then(function(){
       toast('Status atualizado: ' + novoStatus);
-      // Abre WhatsApp automaticamente se Agendado ou Reagendado
       if ((novoStatus === 'Agendado' || novoStatus === 'Reagendado') && WHATSAPP[comprador]) {
         setTimeout(function(){ abrirWhatsApp(comprador, novoStatus, cliente, data, pedidosData[idx].tipo); }, 500);
       }
