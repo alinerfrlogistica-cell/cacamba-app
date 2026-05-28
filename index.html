@@ -414,7 +414,8 @@ function resetForm() {
 function carregarPedidos() {
   document.getElementById('lista-pedidos').innerHTML = '<div class="empty-state"><p>Carregando…</p></div>';
   fetch(SCRIPT_URL).then(function(r){ return r.json(); }).then(function(data) {
-    pedidosData = isAdmin ? data : data.filter(function(p){ return p.comprador === usuarioLogado; });
+    var todos = isAdmin ? data : data.filter(function(p){ return p.comprador === usuarioLogado; });
+pedidosData = todos.reverse();
     renderPedidos();
   }).catch(function(){ pedidosData = []; renderPedidos(); });
 }
