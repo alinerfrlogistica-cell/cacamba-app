@@ -54,6 +54,9 @@ input[type=text], input[type=date], input[type=password], textarea, select {
 input:focus, textarea:focus, select:focus { border-color: var(--green); background: white; }
 input:disabled { background: var(--gray-100); color: var(--gray-400); cursor: not-allowed; }
 textarea { resize: vertical; min-height: 70px; }
+/* Maiúsculas automáticas nos campos de texto e textarea */
+input[type=text], textarea { text-transform: uppercase; }
+input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
 .btn:hover { background: #15692f; }
 .btn:active { transform: scale(0.98); }
@@ -173,7 +176,14 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
       <div class="field"><label>Cliente <span class="req">*</span></label><input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" /></div>
-      <div class="field"><label>Cidade <span class="req">*</span></label><input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" /></div>
+      <div class="field">
+        <label>Tipo de pessoa <span class="req">*</span></label>
+        <div class="chips" id="chips-pessoa">
+          <div class="chip" onclick="pick(this,'pessoa')">Pessoa Física</div>
+          <div class="chip" onclick="pick(this,'pessoa')">Pessoa Jurídica</div>
+        </div>
+      </div>
+      <div class="field"><label>Endereço <span class="req">*</span></label><input type="text" id="f-cidade" placeholder="Ex: Indaiatuba" /></div>
       <div class="field">
         <label>Data necessária <span class="req">*</span></label>
         <input type="date" id="f-data" onchange="verificarDisponibilidade()" />
@@ -259,7 +269,7 @@ var WHATSAPP = {
   'Valtinho':'5519981389317'
 };
 
-var sel = { comprador:'', tipo:'', servico:'' };
+var sel = { comprador:'', tipo:'', servico:'', pessoa:'' };
 var filtroAtivo = 'todos';
 var pedidosData = [];
 var usuarioLogado = null;
@@ -361,19 +371,20 @@ function enviar() {
   if (!sel.tipo) { toast('Selecione o tipo de caçamba'); return; }
   if (!sel.servico) { toast('Selecione o serviço'); return; }
   if (!getResiduo()) { toast('Selecione o tipo de resíduo'); return; }
-  var cliente = document.getElementById('f-cliente').value.trim();
-  var cidade = document.getElementById('f-cidade').value.trim();
+  var cliente = document.getElementById('f-cliente').value.trim().toUpperCase();
+  if (!sel.pessoa) { toast('Selecione Pessoa Física ou Jurídica'); return; }
+  var cidade = document.getElementById('f-cidade').value.trim().toUpperCase();
   var data = document.getElementById('f-data').value;
   if (!cliente) { toast('Informe o cliente'); return; }
-  if (!cidade) { toast('Informe a cidade'); return; }
+  if (!cidade) { toast('Informe o endereço'); return; }
   if (!data) { toast('Selecione a data'); return; }
   var btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Enviando…';
   var payload = {
     comprador: sel.comprador, tipo: sel.tipo, servico: sel.servico,
-    residuo: getResiduo(), cliente: cliente, cidade: cidade,
-    data: data, obs: document.getElementById('f-obs').value.trim()
+    residuo: getResiduo(), cliente: cliente, pessoa: sel.pessoa, cidade: cidade,
+    data: data, obs: document.getElementById('f-obs').value.trim().toUpperCase()
   };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload) })
     .then(function(r){ return r.json(); })
@@ -402,7 +413,7 @@ function resetForm() {
   document.getElementById('form-content').style.display = 'block';
   document.getElementById('success-box').style.display = 'none';
   document.querySelectorAll('.chip.on').forEach(function(c){ c.classList.remove('on'); });
-  sel = { comprador:'', tipo:'', servico:'' };
+  sel = { comprador:'', tipo:'', servico:'', pessoa:'' };
   ['f-cliente','f-cidade','f-data','f-obs'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('btn-enviar').disabled = false;
   document.getElementById('btn-enviar').textContent = 'Enviar solicitação';
@@ -415,7 +426,7 @@ function carregarPedidos() {
   document.getElementById('lista-pedidos').innerHTML = '<div class="empty-state"><p>Carregando…</p></div>';
   fetch(SCRIPT_URL).then(function(r){ return r.json(); }).then(function(data) {
     var todos = isAdmin ? data : data.filter(function(p){ return p.comprador === usuarioLogado; });
-pedidosData = todos.reverse();
+    pedidosData = todos.reverse();
     renderPedidos();
   }).catch(function(){ pedidosData = []; renderPedidos(); });
 }
@@ -432,7 +443,7 @@ function renderPedidos() {
     var bc = st==='Agendado'?'badge-agendado':st==='Reagendado'?'badge-reagendado':'badge-pendente';
     var dataExib = p.data ? String(p.data).substring(0,10).split('-').reverse().join('/') : '';
     html += '<div class="pedido-card">';
-    html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+p.cidade+'</div></div>';
+    html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+(p.pessoa ? p.pessoa+' · ' : '')+p.cidade+'</div></div>';
     html += '<span class="badge '+bc+'" id="badge-'+i+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
