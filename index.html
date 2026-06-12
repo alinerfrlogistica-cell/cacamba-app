@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caçamba — Solicitações v4</title>
+<title>Caçamba — Solicitações v6</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -164,13 +164,16 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
           <div class="chip" onclick="pick(this,'tipo')">Rollon</div>
           <div class="chip" onclick="pick(this,'tipo')">Polly</div>
           <div class="chip" onclick="pick(this,'tipo')">Munck</div>
+          <div class="chip" onclick="pick(this,'tipo')">Polly Duplo</div>
+          <div class="chip" onclick="pick(this,'tipo')">Munck + Rollon</div>
+          <div class="chip" onclick="pick(this,'tipo')">Julieta</div>
         </div>
       </div>
       <div class="field">
         <label>Serviço <span class="req">*</span></label>
         <div class="chips" id="chips-servico">
-          <div class="chip" onclick="pick(this,'servico')">Troca</div>
-          <div class="chip" onclick="pick(this,'servico')">Retira</div>
+          <div class="chip" onclick="pick(this,'servico')">Trocar</div>
+          <div class="chip" onclick="pick(this,'servico')">Retirar</div>
           <div class="chip" onclick="pick(this,'servico')">Instalar</div>
         </div>
       </div>
@@ -185,6 +188,7 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
           <div class="chip" onclick="multi(this)">Cavaco</div>
           <div class="chip" onclick="multi(this)">Alumínio</div>
           <div class="chip" onclick="multi(this)">Ecológica</div>
+          <div class="chip" onclick="multi(this)">Outro</div>
         </div>
       </div>
       <div class="field"><label>Cliente <span class="req">*</span></label><input type="text" id="f-cliente" placeholder="Nome do cliente / empresa" /></div>
