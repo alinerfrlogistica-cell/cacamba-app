@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caçamba — Solicitações v2</title>
+<title>Caçamba — Solicitações v3</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11,6 +11,7 @@
   --red: #dc2626; --amber: #d97706; --amber-light: #fffbeb;
   --blue: #2563eb; --blue-light: #eff6ff;
   --purple: #7c3aed; --purple-light: #f3e8ff;
+  --teal: #0f766e; --teal-light: #f0fdfa;
   --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
   --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
   --gray-600: #4b5563; --gray-700: #374151; --gray-900: #111827;
@@ -54,7 +55,6 @@ input[type=text], input[type=date], input[type=password], textarea, select {
 input:focus, textarea:focus, select:focus { border-color: var(--green); background: white; }
 input:disabled { background: var(--gray-100); color: var(--gray-400); cursor: not-allowed; }
 textarea { resize: vertical; min-height: 70px; }
-/* Maiúsculas automáticas nos campos de texto e textarea */
 input[type=text], textarea { text-transform: uppercase; }
 input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .btn { display: block; width: 100%; padding: 13px; background: var(--green); color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
@@ -82,11 +82,23 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .badge-pendente { background: var(--amber-light); color: var(--amber); }
 .badge-agendado { background: var(--blue-light); color: var(--blue); }
 .badge-reagendado { background: var(--purple-light); color: var(--purple); }
+.badge-realizado { background: var(--teal-light); color: var(--teal); }
 .pedido-body { padding: 10px 16px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .pedido-tag { font-size: 12px; color: var(--gray-600); background: var(--gray-100); border-radius: 5px; padding: 3px 8px; font-family: 'DM Mono', monospace; }
 .pedido-comprador { font-size: 12px; color: var(--gray-400); margin-left: auto; }
 .pedido-data { font-size: 12px; color: var(--gray-400); }
 .pedido-obs { font-size: 12px; color: var(--gray-500); font-style: italic; padding: 0 16px 10px; }
+.pedido-realizado-row { padding: 0 16px 12px; display: flex; align-items: center; gap: 8px; }
+.pedido-realizado-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); }
+.pedido-realizado-data { font-size: 12px; color: var(--gray-600); font-family: 'DM Mono', monospace; }
+.pedido-atraso { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.pedido-atraso-sim { background: #fef2f2; color: var(--red); }
+.pedido-atraso-nao { background: var(--green-light); color: var(--green); }
+.data-realizada-row { padding: 8px 16px 12px; display: flex; align-items: center; gap: 10px; background: var(--teal-light); border-top: 1px solid #ccfbf1; }
+.data-realizada-row label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); white-space: nowrap; }
+.data-realizada-row input[type=date] { width: auto; font-size: 13px; padding: 5px 8px; border-color: #99f6e4; background: white; flex: 1; max-width: 160px; }
+.data-realizada-row button { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 14px; background: var(--teal); color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.data-realizada-row button:hover { background: #0d6560; }
 .status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px; background: white; color: var(--gray-700); cursor: pointer; outline: none; width: auto; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
 .empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); margin-bottom: 12px; }
@@ -238,6 +250,7 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
         <div class="filter-chip" onclick="filtrar(this,'Pendente')">Pendente</div>
         <div class="filter-chip" onclick="filtrar(this,'Agendado')">Agendado</div>
         <div class="filter-chip" onclick="filtrar(this,'Reagendado')">Reagendado</div>
+        <div class="filter-chip" onclick="filtrar(this,'Realizado')">Realizado</div>
         <button class="btn btn-outline btn-sm" onclick="carregarPedidos()" style="margin-left:auto">↻ Atualizar</button>
       </div>
     </div>
@@ -431,6 +444,25 @@ function carregarPedidos() {
   }).catch(function(){ pedidosData = []; renderPedidos(); });
 }
 
+function badgeClass(st) {
+  if (st === 'Agendado') return 'badge-agendado';
+  if (st === 'Reagendado') return 'badge-reagendado';
+  if (st === 'Realizado') return 'badge-realizado';
+  return 'badge-pendente';
+}
+
+function calcAtraso(dataPrevista, dataRealizada) {
+  if (!dataPrevista || !dataRealizada) return null;
+  var d1 = new Date(String(dataPrevista).substring(0,10));
+  var d2 = new Date(String(dataRealizada).substring(0,10));
+  return Math.round((d2 - d1) / (1000*60*60*24));
+}
+
+function fmtData(d) {
+  if (!d) return '';
+  return String(d).substring(0,10).split('-').reverse().join('/');
+}
+
 function renderPedidos() {
   var lista = filtroAtivo === 'todos' ? pedidosData : pedidosData.filter(function(p){ return (p.status||'Pendente') === filtroAtivo; });
   if (!lista.length) {
@@ -440,18 +472,21 @@ function renderPedidos() {
   var html = '';
   lista.forEach(function(p, i) {
     var st = p.status || 'Pendente';
-    var bc = st==='Agendado'?'badge-agendado':st==='Reagendado'?'badge-reagendado':'badge-pendente';
-    var dataExib = p.data ? String(p.data).substring(0,10).split('-').reverse().join('/') : '';
+    var bc = badgeClass(st);
+    var dataExib = fmtData(p.data);
+    var dataRealizadaExib = fmtData(p.dataRealizada);
+    var atraso = calcAtraso(p.data, p.dataRealizada);
+
     html += '<div class="pedido-card">';
     html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+(p.pessoa ? p.pessoa+' · ' : '')+p.cidade+'</div></div>';
     html += '<span class="badge '+bc+'" id="badge-'+i+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
-    if (dataExib) html += '<span class="pedido-data">'+dataExib+'</span>';
+    if (dataExib) html += '<span class="pedido-data">Prev: '+dataExib+'</span>';
     if (isAdmin) {
       html += '<span class="pedido-comprador">'+p.comprador+'</span>';
       html += '<select class="status-select" id="sel-'+i+'" onchange="mudarStatus('+i+',this.value,'+p.id+',\''+p.comprador+'\',\''+p.cliente+'\',\''+p.data+'\')">';
-      ['Pendente','Agendado','Reagendado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
+      ['Pendente','Agendado','Reagendado','Realizado'].forEach(function(s){ html += '<option'+(s===st?' selected':'')+'>'+s+'</option>'; });
       html += '</select>';
       if (WHATSAPP[p.comprador]) {
         html += '<button class="wpp-btn" onclick="abrirWhatsApp(\''+p.comprador+'\',\''+st+'\',\''+p.cliente+'\',\''+p.data+'\',\''+p.tipo+'\')">';
@@ -460,21 +495,56 @@ function renderPedidos() {
       }
     }
     html += '</div>';
+
+    // Linha data realizada (se já preenchida)
+    if (st === 'Realizado' && dataRealizadaExib) {
+      var atrasoTxt = '';
+      if (atraso !== null) {
+        if (atraso > 0) atrasoTxt = '<span class="pedido-atraso pedido-atraso-sim">'+atraso+' dia(s) de atraso</span>';
+        else if (atraso < 0) atrasoTxt = '<span class="pedido-atraso pedido-atraso-nao">'+(Math.abs(atraso))+' dia(s) antecipado</span>';
+        else atrasoTxt = '<span class="pedido-atraso pedido-atraso-nao">No prazo</span>';
+      }
+      html += '<div class="pedido-realizado-row"><span class="pedido-realizado-label">Realizado em:</span><span class="pedido-realizado-data">'+dataRealizadaExib+'</span>'+atrasoTxt+'</div>';
+    }
+
+    // Campo para preencher data realizada (admin, status Realizado, sem data ainda)
+    if (isAdmin && st === 'Realizado' && !p.dataRealizada) {
+      html += '<div class="data-realizada-row" id="drrow-'+i+'">';
+      html += '<label>Data realizada:</label>';
+      html += '<input type="date" id="dr-'+i+'" />';
+      html += '<button onclick="salvarDataRealizada('+i+','+p.id+')">Salvar</button>';
+      html += '</div>';
+    }
+
     if (p.obs) html += '<div class="pedido-obs">'+p.obs+'</div>';
     html += '</div>';
   });
   document.getElementById('lista-pedidos').innerHTML = html;
 }
 
+function salvarDataRealizada(idx, linhaId) {
+  var val = document.getElementById('dr-'+idx).value;
+  if (!val) { toast('Selecione a data realizada'); return; }
+  pedidosData[idx].dataRealizada = val;
+  var payload = { acao: 'atualizar_status', id: linhaId, status: 'Realizado', dataRealizada: val };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
+    .then(function(){
+      toast('Data realizada salva!');
+      renderPedidos();
+    })
+    .catch(function(){ toast('Erro ao salvar.'); });
+}
+
 function mudarStatus(idx, novoStatus, linhaId, comprador, cliente, data) {
   pedidosData[idx].status = novoStatus;
-  var bc = novoStatus==='Agendado'?'badge-agendado':novoStatus==='Reagendado'?'badge-reagendado':'badge-pendente';
+  var bc = badgeClass(novoStatus);
   var badge = document.getElementById('badge-'+idx);
   if (badge) { badge.className = 'badge '+bc; badge.textContent = novoStatus; }
   var payload = { acao: 'atualizar_status', id: linhaId, status: novoStatus };
   fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload), mode:'no-cors' })
     .then(function(){
       toast('Status atualizado: ' + novoStatus);
+      renderPedidos();
       if ((novoStatus === 'Agendado' || novoStatus === 'Reagendado') && WHATSAPP[comprador]) {
         setTimeout(function(){ abrirWhatsApp(comprador, novoStatus, cliente, data, pedidosData[idx].tipo); }, 500);
       }
@@ -485,15 +555,7 @@ function mudarStatus(idx, novoStatus, linhaId, comprador, cliente, data) {
 function abrirWhatsApp(comprador, status, cliente, data, tipo) {
   var numero = WHATSAPP[comprador];
   if (!numero) return;
-  var dataFormatada = '';
-  if (data) {
-    var partes = String(data).substring(0, 10).split('-');
-    if (partes.length === 3) {
-      dataFormatada = partes[2] + '/' + partes[1] + '/' + partes[0];
-    } else {
-      dataFormatada = data;
-    }
-  }
+  var dataFormatada = fmtData(data);
   var msg = '';
   if (status === 'Agendado') {
     msg = 'Olá ' + comprador + '! ✅ Seu pedido de *' + tipo + '* para o cliente *' + cliente + '* foi *AGENDADO* para o dia *' + dataFormatada + '*. Qualquer dúvida entre em contato.';
