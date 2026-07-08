@@ -12,6 +12,7 @@
   --blue: #2563eb; --blue-light: #eff6ff;
   --purple: #7c3aed; --purple-light: #f3e8ff;
   --teal: #0f766e; --teal-light: #f0fdfa;
+  --orange: #ea580c; --orange-light: #fff7ed;
   --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
   --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
   --gray-600: #4b5563; --gray-700: #374151; --gray-900: #111827;
@@ -87,6 +88,7 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .pedido-tag { font-size: 12px; color: var(--gray-600); background: var(--gray-100); border-radius: 5px; padding: 3px 8px; font-family: 'DM Mono', monospace; }
 .pedido-comprador { font-size: 12px; color: var(--gray-400); margin-left: auto; }
 .pedido-data { font-size: 12px; color: var(--gray-400); }
+.pedido-data-original { font-size: 11px; color: var(--orange); background: var(--orange-light); border-radius: 4px; padding: 2px 7px; font-family: 'DM Mono', monospace; }
 .pedido-obs { font-size: 12px; color: var(--gray-500); font-style: italic; padding: 0 16px 10px; }
 .pedido-realizado-row { padding: 0 16px 12px; display: flex; align-items: center; gap: 8px; }
 .pedido-realizado-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); }
@@ -99,6 +101,13 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .data-realizada-row input[type=date] { width: auto; font-size: 13px; padding: 5px 8px; border-color: #99f6e4; background: white; flex: 1; max-width: 160px; }
 .data-realizada-row button { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 14px; background: var(--teal); color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
 .data-realizada-row button:hover { background: #0d6560; }
+.alterar-data-row { padding: 8px 16px 12px; display: flex; align-items: center; gap: 10px; background: var(--orange-light); border-top: 1px solid #fed7aa; }
+.alterar-data-row label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--orange); white-space: nowrap; }
+.alterar-data-row input[type=date] { width: auto; font-size: 13px; padding: 5px 8px; border-color: #fdba74; background: white; flex: 1; max-width: 160px; }
+.alterar-data-row button { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 14px; background: var(--orange); color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.alterar-data-row button:hover { background: #c2410c; }
+.alterar-data-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; background: var(--orange-light); color: var(--orange); border: 1px solid #fdba74; border-radius: 20px; cursor: pointer; white-space: nowrap; }
+.alterar-data-btn:hover { background: #fed7aa; }
 .status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px; background: white; color: var(--gray-700); cursor: pointer; outline: none; width: auto; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
 .empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); margin-bottom: 12px; }
@@ -266,7 +275,7 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 <div class="toast" id="toast"></div>
 
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3qqnb1hqLeyWVgYLonI24rJqX3X1yU4XhBwYXcz9RNH4VMJlubvx4P3pEDyfMyacL/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwe805iGNFA0qlNQcOgukWQAoKRD64UoA3WfqxDs9sk4bLybyBPxt7V_7m7ogzg0wjp/exec';
 
 var SENHAS = {
   'Alex':'3847','Ana':'7291','Daniela':'5163','Kezia':'9438',
@@ -478,8 +487,11 @@ function renderPedidos() {
     var st = p.status || 'PENDENTE';
     var bc = badgeClass(st);
     var dataExib = fmtData(p.data);
+    var dataOriginalExib = fmtData(p.dataOriginal);
     var dataRealizadaExib = fmtData(p.dataRealizada);
     var atraso = calcAtraso(p.data, p.dataRealizada);
+    var alteracoes = Number(p.alteracoes) || 0;
+    var podeAlterar = alteracoes < 2 && st !== 'REALIZADO';
 
     html += '<div class="pedido-card">';
     html += '<div class="pedido-header"><div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-cidade">'+(p.pessoa ? p.pessoa+' · ' : '')+p.cidade+'</div></div>';
@@ -487,6 +499,8 @@ function renderPedidos() {
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
     if (dataExib) html += '<span class="pedido-data">Prev: '+dataExib+'</span>';
+    if (dataOriginalExib) html += '<span class="pedido-data-original">Orig: '+dataOriginalExib+'</span>';
+
     if (isAdmin) {
       html += '<span class="pedido-comprador">'+p.comprador+'</span>';
       html += '<select class="status-select" id="sel-'+i+'" onchange="mudarStatus('+i+',this.value,'+p.id+',\''+p.comprador+'\',\''+p.cliente+'\',\''+p.data+'\')">';
@@ -498,9 +512,18 @@ function renderPedidos() {
         html += '</button>';
       }
     }
+
+    // Botão alterar data (para comprador e admin)
+    if (podeAlterar) {
+      html += '<button class="alterar-data-btn" onclick="toggleAlterarData('+i+')" id="btn-alt-'+i+'">';
+      html += '✏️ Alterar data' + (alteracoes > 0 ? ' ('+alteracoes+'/2)' : '') + '</button>';
+    } else if (alteracoes >= 2 && st !== 'REALIZADO') {
+      html += '<span style="font-size:11px;color:var(--gray-400);margin-left:4px">Limite de alterações atingido</span>';
+    }
+
     html += '</div>';
 
-    // Linha data realizada (se já preenchida)
+    // Linha data realizada
     if (st === 'REALIZADO' && dataRealizadaExib) {
       var atrasoTxt = '';
       if (atraso !== null) {
@@ -511,7 +534,7 @@ function renderPedidos() {
       html += '<div class="pedido-realizado-row"><span class="pedido-realizado-label">Realizado em:</span><span class="pedido-realizado-data">'+dataRealizadaExib+'</span>'+atrasoTxt+'</div>';
     }
 
-    // Campo para preencher data realizada (admin, status Realizado, sem data ainda)
+    // Campo data realizada (admin)
     if (isAdmin && st === 'REALIZADO' && !p.dataRealizada) {
       html += '<div class="data-realizada-row" id="drrow-'+i+'">';
       html += '<label>Data realizada:</label>';
@@ -520,10 +543,44 @@ function renderPedidos() {
       html += '</div>';
     }
 
+    // Campo alterar data (oculto por padrão)
+    if (podeAlterar) {
+      html += '<div class="alterar-data-row" id="altrow-'+i+'" style="display:none">';
+      html += '<label>Nova data:</label>';
+      html += '<input type="date" id="altdata-'+i+'" value="'+p.data+'" />';
+      html += '<button onclick="confirmarAlterarData('+i+','+p.id+')">Confirmar</button>';
+      html += '</div>';
+    }
+
     if (p.obs) html += '<div class="pedido-obs">'+p.obs+'</div>';
     html += '</div>';
   });
   document.getElementById('lista-pedidos').innerHTML = html;
+}
+
+function toggleAlterarData(idx) {
+  var row = document.getElementById('altrow-'+idx);
+  if (row) {
+    row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  }
+}
+
+function confirmarAlterarData(idx, linhaId) {
+  var novaData = document.getElementById('altdata-'+idx).value;
+  if (!novaData) { toast('Selecione a nova data'); return; }
+  if (novaData === pedidosData[idx].data) { toast('A data é a mesma. Escolha uma data diferente.'); return; }
+  var payload = { acao: 'alterar_data', id: linhaId, novaData: novaData };
+  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(resp) {
+      if (resp.status === 'erro') {
+        toast('🚫 ' + resp.mensagem);
+      } else {
+        toast('✅ Data alterada com sucesso!');
+        carregarPedidos();
+      }
+    })
+    .catch(function(){ toast('Erro ao alterar data.'); });
 }
 
 function salvarDataRealizada(idx, linhaId) {
