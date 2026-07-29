@@ -518,6 +518,8 @@ function renderPedidos() {
     html += '<span class="badge '+bc+'" id="badge-'+i+'">'+st+'</span></div>';
     html += '<div class="pedido-body">';
     html += '<span class="pedido-tag">'+p.tipo+'</span><span class="pedido-tag">'+p.servico+'</span><span class="pedido-tag">'+p.residuo+'</span>';
+if (p.nota) html += '<span class="pedido-tag">NF: '+p.nota+'</span>';
+if (p.caminhao) html += '<span class="pedido-tag">'+p.caminhao+'</span>';;
     if (dataExib) html += '<span class="pedido-data">PREV: '+dataExib+'</span>';
     if (dataOriginalExib) html += '<span class="pedido-data-original">ORIG: '+dataOriginalExib+'</span>';
 
