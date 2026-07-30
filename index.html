@@ -108,6 +108,8 @@ input[type=text]::placeholder, textarea::placeholder { text-transform: none; }
 .alterar-data-row button:hover { background: #c2410c; }
 .alterar-data-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; background: var(--orange-light); color: var(--orange); border: 1px solid #fdba74; border-radius: 20px; cursor: pointer; white-space: nowrap; text-transform: uppercase; }
 .alterar-data-btn:hover { background: #fed7aa; }
+.replicar-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; background: var(--blue-light); color: var(--blue); border: 1px solid #bfdbfe; border-radius: 20px; cursor: pointer; white-space: nowrap; text-transform: uppercase; }
+.replicar-btn:hover { background: #dbeafe; }
 .status-select { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border: 1px solid var(--gray-200); border-radius: 5px; padding: 4px 8px; background: white; color: var(--gray-700); cursor: pointer; outline: none; width: auto; text-transform: uppercase; }
 .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
 .empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); margin-bottom: 12px; }
@@ -450,6 +452,44 @@ function enviar() {
     });
 }
 
+function replicarPedido(idx) {
+  var p = pedidosData[idx];
+  if (!p) return;
+  resetForm();
+  showPage('form');
+  document.querySelectorAll('.nav-tab').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('tab-solicitar').classList.add('active');
+
+  function marcar(grupo, valor) {
+    if (!valor) return;
+    document.querySelectorAll('#chips-'+grupo+' .chip').forEach(function(c){
+      if (c.textContent === valor) { c.classList.add('on'); sel[grupo] = valor; }
+    });
+  }
+  marcar('comprador', p.comprador);
+  marcar('tipo', p.tipo);
+  marcar('caminhao', p.caminhao);
+  marcar('servico', p.servico);
+  marcar('pessoa', p.pessoa);
+  marcar('nota', p.nota);
+
+  if (p.residuo) {
+    var itens = p.residuo.split(',').map(function(s){ return s.trim(); });
+    document.querySelectorAll('#chips-residuo .chip').forEach(function(c){
+      if (itens.indexOf(c.textContent) !== -1) c.classList.add('on');
+    });
+  }
+
+  document.getElementById('f-cliente').value = p.cliente || '';
+  document.getElementById('f-cidade').value = p.cidade || '';
+  document.getElementById('f-obs').value = p.obs || '';
+  document.getElementById('f-data').value = '';
+  document.getElementById('disp-box').style.display = 'none';
+
+  toast('DADOS COPIADOS! CONFIRA E ESCOLHA A NOVA DATA.');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function showSuccess() {
   document.getElementById('form-content').style.display = 'none';
   document.getElementById('success-box').style.display = 'block';
@@ -541,6 +581,8 @@ if (p.caminhao) html += '<span class="pedido-tag">'+p.caminhao+'</span>';;
     } else if (alteracoes >= 2 && st !== 'REALIZADO') {
       html += '<span style="font-size:11px;color:var(--gray-400);margin-left:4px;text-transform:uppercase">LIMITE DE ALTERAÇÕES ATINGIDO</span>';
     }
+
+    html += '<button class="replicar-btn" onclick="replicarPedido('+i+')">🔁 REPLICAR</button>';
 
     html += '</div>';
 
